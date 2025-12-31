@@ -126,7 +126,7 @@ NotThing2:
         mov     dx, 0CFCh
         in      eax, dx             ; read CONFIG_DATA
 
-        mov     ebx, eax
+        
         call    DisplayError
 
 ;       
@@ -134,12 +134,18 @@ NotThing2:
 Testa endp
 ;;---------------------------------------------------
 DisplayError proc
+    push    eax
     push    ebx
+    push    ecx
+    push    edx
+
+    mov     ecx, eax            
 
     ; =========================
-    ; Device ID (high 16 bits)
+    ; Device ID = EAX[31:16]
     ; =========================
-    shr     ebx, 16          ; EBX = Device ID
+    mov     ebx, ecx
+    shr     ebx, 16             ; EBX = Device ID
 
     mov     dl, bh
     call    HexToAscii
@@ -155,12 +161,12 @@ DisplayError proc
     mov     dx, offset DeviceMsg
     int     21h
 
-    pop     ebx
-    push    ebx
+    ; =========================
+    ; Vendor ID = EAX[15:0]
+    ; =========================
+    mov     ebx, ecx
+    and     ebx, 0FFFFh         ; EBX = Vendor ID
 
-    ; =========================
-    ; Vendor ID (low 16 bits)
-    ; =========================
     mov     dl, bh
     call    HexToAscii
     mov     VendorData, dh
@@ -175,7 +181,10 @@ DisplayError proc
     mov     dx, offset VendorMsg
     int     21h
 
+    pop     edx
+    pop     ecx
     pop     ebx
+    pop     eax
     ret
 DisplayError endp
 
