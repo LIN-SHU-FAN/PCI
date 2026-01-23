@@ -1,2 +1,1 @@
-..\ml calepci.asm
-..\link calepci.obj
+..\jwasmr -mz calepci.asm
